@@ -1,3 +1,19 @@
+# v1.3
+
+## RU
+
+- IPv6: исходящий Hop Limit фиксируется на 64; входящий HL=1 увеличивается до 2 до маршрутизации.
+- Link-local unicast и multicast IPv6 не изменяются для сохранения Neighbor Discovery и других локальных управляющих пакетов.
+- BPF-обход снимается для IPv4 и IPv6; оба семейства правил и фильтров восстанавливаются при отключении.
+- Обработка остаётся событийной, без периодического опроса и NFQUEUE.
+
+## EN
+
+- IPv6: outgoing Hop Limit is set to 64; incoming HL=1 is increased to 2 before forwarding.
+- IPv6 link-local unicast and multicast remain unchanged to preserve Neighbor Discovery and local control traffic.
+- Removes IPv4 and IPv6 BPF bypass; restores both rule families and filters on disabling.
+- Handling remains event-driven, without periodic polling or NFQUEUE.
+
 # v1.2
 
 ## RU

@@ -25,6 +25,7 @@ jobs:
       - name: Validate shell syntax and build
         run: |
           bash -n customize.sh service.sh cleanup.sh post-fs-data.sh uninstall.sh
+          python3 tests/check_bpf_parser.py
           python3 scripts/build.py
       - name: Attest module ZIP
         uses: actions/attest-build-provenance@43d14bc2b83dec42d39ecae14e916627a18bb661 # v3

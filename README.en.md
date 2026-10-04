@@ -6,7 +6,7 @@
 
 **Internet tethering with TTL adjustment in the kernel**
 
-KernelSU · Wild Kernel · IPv4 · Version 1.2
+KernelSU · Wild Kernel · IPv4 / IPv6 · Version 1.3
 
 </div>
 
@@ -23,12 +23,14 @@ responds to netlink and inotify events, with no periodic polling.
 | --- | --- | --- |
 | To the mobile network | `POSTROUTING`, outgoing interface `rmnet_data*` | TTL is set to **64** |
 | From the mobile network | `PREROUTING`, incoming interface `rmnet_data*`, TTL=1 | TTL is increased to **2** before forwarding |
-| IPv6 | No rules applied | Unchanged |
+| IPv6 to the mobile network | `POSTROUTING`, outgoing interface `rmnet_data*` | HL is set to **64** |
+| IPv6 from the mobile network | `PREROUTING`, incoming interface `rmnet_data*`, HL=1 | HL is increased to **2** before forwarding |
+| Link-local IPv6 | Destination `fe80::/10` or `ff02::/16` | Unchanged; preserves HL=255 for Neighbor Discovery |
 
-The outgoing rule also covers the phone's own mobile IPv4 traffic.
+The outgoing rule also covers the phone's own mobile IPv4/IPv6 traffic.
 
 To prevent the accelerated path from bypassing these rules, the module disables
-hardware tethering offload and removes IPv4 BPF tethering filters. It watches
+hardware tethering offload and removes IPv4 and IPv6 BPF tethering filters. It watches
 interface events with `ip monitor link`, filter installation with `tc monitor`,
 and module disabling with `inotifyd`. When there are no events, the processes
 block while waiting.
@@ -68,7 +70,8 @@ The handler does not acquire a wakelock. Deep sleep was not measured separately.
 
 ### Not yet verified
 
-- Incoming TTL=1 has not yet been observed in live traffic.
+- Incoming TTL=1 and HL=1 have not yet been observed in live traffic.
+- The phone kernel accepted IPv6 rules; end-to-end IPv6 tethering and IPv6 BPF rollback have not yet been verified on a live connection.
 - Reboot and an actual tethering restart have not been tested separately.
 - Other devices and firmware require verification of interface and BPF program names.
 
@@ -82,6 +85,8 @@ Run in a root shell on the phone:
 # TTL rule counters
 iptables -t mangle -L KTTL_OUT -nv
 iptables -t mangle -L KTTL_IN -nv
+ip6tables -t mangle -L KTTL_OUT -nv
+ip6tables -t mangle -L KTTL_IN -nv
 
 # Event handling count and process IDs
 cat /data/adb/modules/ttl_kernel_tether/state/reconciles
@@ -119,7 +124,7 @@ Builds run when a tag matching `version` in `module.prop` is pushed. For the nex
 Verify a downloaded ZIP with a current GitHub CLI:
 
 ```sh
-gh attestation verify kernel-ttl-tether-v1.2.zip --repo vlw/Kernel-TTL-Tether-fix
+gh attestation verify kernel-ttl-tether-v1.3.zip --repo vlw/Kernel-TTL-Tether-fix
 sha256sum -c SHA256SUMS
 ```
 

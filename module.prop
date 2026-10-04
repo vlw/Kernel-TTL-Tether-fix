@@ -1,7 +1,7 @@
 id=ttl_kernel_tether
 name=Kernel TTL Tether Fix
-version=v1.2
-versionCode=3
+version=v1.3
+versionCode=4
 author=Vladimir B (vlw)
-description=IPv4 TTL=64 upstream; incoming TTL=1 -> 2. Kernel iptables, no NFQUEUE. Event-driven netlink/inotify, no polling. Disables bypassing IPv4 offload.
+description=IPv4 TTL / IPv6 HL=64 upstream; incoming 1 -> 2. Preserves IPv6 link-local control traffic. Kernel rules, no NFQUEUE or polling. Disables bypassing IPv4/IPv6 offload.
 updateJson=https://github.com/vlw/Kernel-TTL-Tether-fix/releases/latest/download/update.json

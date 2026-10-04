@@ -6,7 +6,7 @@
 
 **Раздача интернета с фиксацией TTL внутри ядра**
 
-KernelSU · Wild Kernel · IPv4 · Версия 1.2
+KernelSU · Wild Kernel · IPv4 / IPv6 · Версия 1.3
 
 </div>
 
@@ -23,12 +23,14 @@ netlink и inotify — периодического опроса нет.
 | --- | --- | --- |
 | В мобильную сеть | `POSTROUTING`, выход через `rmnet_data*` | TTL устанавливается в **64** |
 | Из мобильной сети | `PREROUTING`, вход через `rmnet_data*`, TTL=1 | TTL увеличивается до **2** до маршрутизации |
-| IPv6 | Правила не применяются | Без изменений |
+| IPv6 в мобильную сеть | `POSTROUTING`, выход через `rmnet_data*` | HL устанавливается в **64** |
+| IPv6 из мобильной сети | `PREROUTING`, вход через `rmnet_data*`, HL=1 | HL увеличивается до **2** до маршрутизации |
+| Link-local IPv6 | Назначение `fe80::/10` или `ff02::/16` | Без изменений; сохраняет HL=255 для Neighbor Discovery |
 
-Исходящее правило охватывает также собственный мобильный IPv4-трафик телефона.
+Исходящее правило охватывает также собственный мобильный IPv4/IPv6-трафик телефона.
 
 Чтобы ускоренный путь не обходил правила, модуль отключает аппаратный offload
-раздачи и снимает IPv4 BPF tether-фильтры. События интерфейсов отслеживает
+раздачи и снимает IPv4 и IPv6 BPF tether-фильтры. События интерфейсов отслеживает
 `ip monitor link`, установку фильтров — `tc monitor`, отключение модуля —
 `inotifyd`. В отсутствие событий процессы блокируются в ожидании.
 
@@ -66,7 +68,8 @@ netlink и inotify — периодического опроса нет.
 
 ### Что ещё не проверено
 
-- Входящий TTL=1 на живом трафике пока не встретился.
+- Входящий TTL=1 и HL=1 на живом трафике пока не встретились.
+- IPv6-правила приняты ядром телефона; сквозная IPv6-раздача и IPv6 BPF-откат пока не проверены на живом подключении.
 - Перезагрузка и фактический перезапуск раздачи отдельно не проверялись.
 - Другие устройства и прошивки требуют проверки имён интерфейсов и BPF-программ.
 
@@ -80,6 +83,8 @@ netlink и inotify — периодического опроса нет.
 # Счётчики TTL-правил
 iptables -t mangle -L KTTL_OUT -nv
 iptables -t mangle -L KTTL_IN -nv
+ip6tables -t mangle -L KTTL_OUT -nv
+ip6tables -t mangle -L KTTL_IN -nv
 
 # Число обработок событий и PID процессов
 cat /data/adb/modules/ttl_kernel_tether/state/reconciles
@@ -117,7 +122,7 @@ Vladimir B (vlw)
 Проверка скачанного ZIP через актуальный GitHub CLI:
 
 ```sh
-gh attestation verify kernel-ttl-tether-v1.2.zip --repo vlw/Kernel-TTL-Tether-fix
+gh attestation verify kernel-ttl-tether-v1.3.zip --repo vlw/Kernel-TTL-Tether-fix
 sha256sum -c SHA256SUMS
 ```
 
