@@ -1,0 +1,17 @@
+# Generated module packages
+/dist/
+*.zip
+
+# Runtime state from the phone
+/state/
+/disable
+/remove
+/update
+*.log
+
+# Editor and OS files
+.idea/
+.vscode/
+*.swp
+*~
+.DS_Store
