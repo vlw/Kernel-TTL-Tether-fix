@@ -6,7 +6,7 @@
 
 **Раздача интернета с фиксацией TTL внутри ядра**
 
-KernelSU · Wild Kernel · IPv4 · Версия 1.1
+KernelSU · Wild Kernel · IPv4 · Версия 1.2
 
 </div>
 
@@ -37,9 +37,7 @@ netlink и inotify — периодического опроса нет.
 1. Соберите ZIP из корня репозитория:
 
    ```sh
-   mkdir -p dist
-   zip -j dist/kernel-ttl-tether-v1.1.zip \
-     module.prop customize.sh service.sh cleanup.sh post-fs-data.sh uninstall.sh LICENSE
+   python3 scripts/build.py
    ```
 
 2. Установите архив через менеджер **KernelSU**.
@@ -109,3 +107,18 @@ Vladimir B (vlw)
 ## Лицензия
 
 [MIT](LICENSE) © 2026 Vladimir B (vlw).
+
+## Релизы и обновления
+
+[Последний релиз](https://github.com/vlw/Kernel-TTL-Tether-fix/releases/latest) содержит ZIP, `SHA256SUMS`, `update.json` и список изменений RU/EN. KSU получает обновления через `updateJson` в `module.prop`. Уже установленную старую версию без этого поля нужно один раз обновить вручную.
+
+Сборка запускается при публикации тега, совпадающего с `version` в `module.prop`. Для следующего релиза увеличьте `versionCode`, обновите `CHANGELOG.md` и отправьте подписанный тег версии. JSON публикуется вместе с готовым релизом и ссылается на файлы конкретной версии.
+
+Проверка скачанного ZIP через актуальный GitHub CLI:
+
+```sh
+gh attestation verify kernel-ttl-tether-v1.2.zip --repo vlw/Kernel-TTL-Tether-fix
+sha256sum -c SHA256SUMS
+```
+
+Аттестация подтверждает происхождение сборки, а не отсутствие ошибок. Менеджер KSU сам её не проверяет.

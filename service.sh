@@ -1,4 +1,9 @@
 #!/system/bin/sh
+# KSU starts scripts in BusyBox standalone mode; use Android ip/tc and shell.
+if [ "${ASH_STANDALONE:-0}" = 1 ]; then
+  export ASH_STANDALONE=0
+  exec /system/bin/sh "$0" "$@"
+fi
 MODDIR=${0%/*}
 PATH=/system/bin:/system/xbin:$PATH
 mkdir -p "$MODDIR/state"

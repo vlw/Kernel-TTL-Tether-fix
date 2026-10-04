@@ -6,7 +6,7 @@
 
 **Internet tethering with TTL adjustment in the kernel**
 
-KernelSU · Wild Kernel · IPv4 · Version 1.1
+KernelSU · Wild Kernel · IPv4 · Version 1.2
 
 </div>
 
@@ -38,9 +38,7 @@ block while waiting.
 1. Build the ZIP from the repository root:
 
    ```sh
-   mkdir -p dist
-   zip -j dist/kernel-ttl-tether-v1.1.zip \
-     module.prop customize.sh service.sh cleanup.sh post-fs-data.sh uninstall.sh LICENSE
+   python3 scripts/build.py
    ```
 
 2. Install the archive through the **KernelSU** manager.
@@ -111,3 +109,18 @@ Vladimir B (vlw)
 ## License
 
 [MIT](LICENSE) © 2026 Vladimir B (vlw).
+
+## Releases and updates
+
+The [latest release](https://github.com/vlw/Kernel-TTL-Tether-fix/releases/latest) includes the ZIP, `SHA256SUMS`, `update.json`, and a RU/EN changelog. KSU discovers updates through `updateJson` in `module.prop`. Previously installed versions without this field require one manual update.
+
+Builds run when a tag matching `version` in `module.prop` is pushed. For the next release, increase `versionCode`, update `CHANGELOG.md`, and push a signed version tag. The update JSON is published with the completed release and references version-specific assets.
+
+Verify a downloaded ZIP with a current GitHub CLI:
+
+```sh
+gh attestation verify kernel-ttl-tether-v1.2.zip --repo vlw/Kernel-TTL-Tether-fix
+sha256sum -c SHA256SUMS
+```
+
+Attestation proves build provenance, not correctness. The KSU manager does not verify it automatically.
