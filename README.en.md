@@ -133,3 +133,5 @@ sha256sum -c SHA256SUMS
 ```
 
 Attestation proves build provenance, not correctness. The KSU manager does not verify it automatically.
+
+Each release and KSU changelog contains only changes for that version. The [full changelog](CHANGELOG.md) is maintained separately.

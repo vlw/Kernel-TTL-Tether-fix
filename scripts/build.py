@@ -7,6 +7,7 @@ from pathlib import Path
 import re
 import stat
 import zipfile
+from release_notes import release_notes
 
 root = Path(__file__).resolve().parent.parent
 props = dict(line.split('=', 1) for line in (root / 'module.prop').read_text().splitlines() if '=' in line)
@@ -33,7 +34,7 @@ with zipfile.ZipFile(dist / name, 'w', zipfile.ZIP_DEFLATED) as archive:
         archive.writestr(info, data)
 checksum = hashlib.sha256((dist / name).read_bytes()).hexdigest()
 (dist / 'SHA256SUMS').write_text(f'{checksum}  {name}\n')
-(dist / 'changelog.md').write_bytes((root / 'CHANGELOG.md').read_bytes())
+(dist / 'changelog.md').write_text(release_notes((root / 'CHANGELOG.md').read_text(), version, repo))
 (dist / 'update.json').write_text(json.dumps({'version': version, 'versionCode': int(props['versionCode']), 'zipUrl': f'{base}/{name}', 'changelog': f'{base}/changelog.md'}, indent=2) + '\n')
 with zipfile.ZipFile(dist / name) as archive:
     assert archive.testzip() is None

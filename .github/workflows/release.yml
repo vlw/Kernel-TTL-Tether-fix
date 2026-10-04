@@ -26,6 +26,7 @@ jobs:
         run: |
           bash -n customize.sh service.sh cleanup.sh post-fs-data.sh uninstall.sh
           python3 tests/check_bpf_parser.py
+          python3 tests/check_release_notes.py
           python3 scripts/build.py
       - name: Attest module ZIP
         uses: actions/attest-build-provenance@43d14bc2b83dec42d39ecae14e916627a18bb661 # v3
@@ -43,4 +44,4 @@ jobs:
           GH_REPO: ${{ github.repository }}
           TAG: ${{ github.ref_name }}
         run: |
-          gh release create "$TAG" dist/* --verify-tag --title "Kernel TTL Tether Fix $TAG" --notes-file CHANGELOG.md
+          gh release create "$TAG" dist/* --verify-tag --title "Kernel TTL Tether Fix $TAG" --notes-file dist/changelog.md
