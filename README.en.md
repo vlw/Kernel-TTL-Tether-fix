@@ -6,7 +6,7 @@
 
 **Internet tethering with TTL adjustment in the kernel**
 
-KernelSU · Wild Kernel · IPv4 / IPv6 · Version 1.3
+KernelSU · Wild Kernel · IPv4 / IPv6 · Version 1.4
 
 </div>
 
@@ -21,9 +21,9 @@ responds to netlink and inotify events, with no periodic polling.
 
 | Direction | Rule | Result |
 | --- | --- | --- |
-| To the mobile network | `POSTROUTING`, outgoing interface `rmnet_data*` | TTL is set to **64** |
+| To the mobile network | `POSTROUTING`, outgoing interface `rmnet_data*` | TTL is set to **64**, except ICMP |
 | From the mobile network | `PREROUTING`, incoming interface `rmnet_data*`, TTL=1 | TTL is increased to **2** before forwarding |
-| IPv6 to the mobile network | `POSTROUTING`, outgoing interface `rmnet_data*` | HL is set to **64** |
+| IPv6 to the mobile network | `POSTROUTING`, outgoing interface `rmnet_data*` | HL is set to **64**, except ICMPv6 |
 | IPv6 from the mobile network | `PREROUTING`, incoming interface `rmnet_data*`, HL=1 | HL is increased to **2** before forwarding |
 | Link-local IPv6 | Destination `fe80::/10` or `ff02::/16` | Unchanged; preserves HL=255 for Neighbor Discovery |
 
@@ -77,6 +77,10 @@ The handler does not acquire a wakelock. Deep sleep was not measured separately.
 
 There may be a brief interval between BPF filter installation and event handling.
 
+## Traceroute
+
+Outgoing ICMP/ICMPv6 bypasses fixing: TTL/HL is decremented normally during forwarding. Use an ICMP tracing mode (for example, `traceroute -I` and `traceroute -6 -I`). UDP/TCP probes still receive TTL/HL=64. Incoming TTL/HL=1 → 2 adjustment remains enabled.
+
 ## Diagnostics
 
 Run in a root shell on the phone:
@@ -124,7 +128,7 @@ Builds run when a tag matching `version` in `module.prop` is pushed. For the nex
 Verify a downloaded ZIP with a current GitHub CLI:
 
 ```sh
-gh attestation verify kernel-ttl-tether-v1.3.zip --repo vlw/Kernel-TTL-Tether-fix
+gh attestation verify kernel-ttl-tether-v1.4.zip --repo vlw/Kernel-TTL-Tether-fix
 sha256sum -c SHA256SUMS
 ```
 

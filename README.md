@@ -6,7 +6,7 @@
 
 **Раздача интернета с фиксацией TTL внутри ядра**
 
-KernelSU · Wild Kernel · IPv4 / IPv6 · Версия 1.3
+KernelSU · Wild Kernel · IPv4 / IPv6 · Версия 1.4
 
 </div>
 
@@ -21,9 +21,9 @@ netlink и inotify — периодического опроса нет.
 
 | Направление | Правило | Результат |
 | --- | --- | --- |
-| В мобильную сеть | `POSTROUTING`, выход через `rmnet_data*` | TTL устанавливается в **64** |
+| В мобильную сеть | `POSTROUTING`, выход через `rmnet_data*` | TTL устанавливается в **64**, кроме ICMP |
 | Из мобильной сети | `PREROUTING`, вход через `rmnet_data*`, TTL=1 | TTL увеличивается до **2** до маршрутизации |
-| IPv6 в мобильную сеть | `POSTROUTING`, выход через `rmnet_data*` | HL устанавливается в **64** |
+| IPv6 в мобильную сеть | `POSTROUTING`, выход через `rmnet_data*` | HL устанавливается в **64**, кроме ICMPv6 |
 | IPv6 из мобильной сети | `PREROUTING`, вход через `rmnet_data*`, HL=1 | HL увеличивается до **2** до маршрутизации |
 | Link-local IPv6 | Назначение `fe80::/10` или `ff02::/16` | Без изменений; сохраняет HL=255 для Neighbor Discovery |
 
@@ -75,6 +75,10 @@ netlink и inotify — периодического опроса нет.
 
 Между установкой BPF-фильтра и обработкой события возможен короткий промежуток.
 
+## Трассировка
+
+Исходящие ICMP/ICMPv6 не фиксируются: TTL/HL уменьшается обычным образом при маршрутизации. Используйте ICMP-режим трассировки (например, `traceroute -I` и `traceroute -6 -I`). UDP/TCP-пробы по-прежнему получают TTL/HL=64. Входящее увеличение TTL/HL=1 → 2 сохраняется.
+
 ## Диагностика
 
 В root-оболочке телефона:
@@ -122,7 +126,7 @@ Vladimir B (vlw)
 Проверка скачанного ZIP через актуальный GitHub CLI:
 
 ```sh
-gh attestation verify kernel-ttl-tether-v1.3.zip --repo vlw/Kernel-TTL-Tether-fix
+gh attestation verify kernel-ttl-tether-v1.4.zip --repo vlw/Kernel-TTL-Tether-fix
 sha256sum -c SHA256SUMS
 ```
 

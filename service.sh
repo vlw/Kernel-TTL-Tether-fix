@@ -30,7 +30,7 @@ iptables -w 2 -t mangle -N KTTL_OUT 2>/dev/null
 iptables -w 2 -t mangle -F KTTL_IN
 iptables -w 2 -t mangle -F KTTL_OUT
 iptables -w 2 -t mangle -A KTTL_IN -i rmnet_data+ -m ttl --ttl-eq 1 -j TTL --ttl-inc 1
-iptables -w 2 -t mangle -A KTTL_OUT -o rmnet_data+ -j TTL --ttl-set 64
+iptables -w 2 -t mangle -A KTTL_OUT -o rmnet_data+ ! -p icmp -j TTL --ttl-set 64
 # Preserve link-local control traffic (e.g. Neighbor Discovery requires HL=255).
 for chain in KTTL_IN KTTL_OUT; do
   ip6tables -w 2 -t mangle -N "$chain" 2>/dev/null
@@ -39,7 +39,7 @@ for chain in KTTL_IN KTTL_OUT; do
   ip6tables -w 2 -t mangle -A "$chain" -d ff02::/16 -j RETURN || exit 1
 done
 ip6tables -w 2 -t mangle -A KTTL_IN -i rmnet_data+ -m hl --hl-eq 1 -j HL --hl-inc 1 || exit 1
-ip6tables -w 2 -t mangle -A KTTL_OUT -o rmnet_data+ -j HL --hl-set 64 || exit 1
+ip6tables -w 2 -t mangle -A KTTL_OUT -o rmnet_data+ ! -p ipv6-icmp -j HL --hl-set 64 || exit 1
 reconcile() {
   iptables -w 2 -t mangle -C PREROUTING -j KTTL_IN 2>/dev/null || iptables -w 2 -t mangle -I PREROUTING 1 -j KTTL_IN
   iptables -w 2 -t mangle -C POSTROUTING -j KTTL_OUT 2>/dev/null || iptables -w 2 -t mangle -I POSTROUTING 1 -j KTTL_OUT

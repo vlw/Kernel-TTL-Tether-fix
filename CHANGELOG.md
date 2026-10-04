@@ -1,3 +1,17 @@
+# v1.4
+
+## RU
+
+- Исходящие ICMP и ICMPv6 исключены из фиксации TTL/HL для трассировки ICMP-пробами.
+- TTL/HL таких пакетов уменьшается обычным образом при маршрутизации; TCP/UDP по-прежнему фиксируются на 64.
+- Входящее увеличение TTL/HL=1 → 2 сохранено. Исключение не относится к UDP/TCP-трассировке.
+
+## EN
+
+- Outgoing ICMP and ICMPv6 are excluded from TTL/HL fixing to allow tracing with ICMP probes.
+- Their TTL/HL is decremented normally during forwarding; TCP/UDP remain fixed at 64.
+- Incoming TTL/HL=1 → 2 adjustment is preserved. This exception does not enable UDP/TCP traceroute.
+
 # v1.3
 
 ## RU
